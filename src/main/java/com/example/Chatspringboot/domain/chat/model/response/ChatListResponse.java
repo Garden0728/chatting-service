@@ -1,0 +1,16 @@
+package com.example.Chatspringboot.domain.chat.model.response;
+
+import com.example.Chatspringboot.domain.chat.model.Message;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.*;
+
+@Schema(description = "Chatting List")
+
+public record ChatListResponse(
+        @Schema(description = "return Message : []")
+        List<Message> result
+) {}
+
+
