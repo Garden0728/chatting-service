@@ -6,10 +6,13 @@ import com.example.Chatspringboot.domain.auth.Model.Response.LoginUserResponse;
 import com.example.Chatspringboot.domain.auth.Service.AuthService;
 import com.example.Chatspringboot.domain.auth.Service.ChatServiceV1;
 import com.example.Chatspringboot.domain.chat.model.response.ChatListResponse;
+import com.example.Chatspringboot.domain.chat.model.response.ChatRecordUserResponse;
+import com.example.Chatspringboot.domain.repository.Entity.Chat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+@Slf4j
 @Tag(name = "Chat API", description = "V1 Chat API")
 @RestController //해당 클래스가 REST API 컨트롤러임을 명시. //restController : 뷰를 반환하지 않고 항상 데이터를 반환한다.
 @RequestMapping("/api/v1/chat") //모든 요청 앞에 /api/v1/auth가 붙음.
@@ -36,6 +39,15 @@ public class ChatControllerV1 {
             @RequestParam("from") @Valid String from
     ){
         return chatServiceV1.chatList(from,to);
+    }
+
+    @GetMapping("/chat-record")
+    public ChatRecordUserResponse ChattingUserList(
+            @RequestParam("name") @Valid String name
+
+    ){
+        log.info("요청 들어옴 name: {}", name);
+        return chatServiceV1.ChattingUserRecordList(name);
     }
 
 
