@@ -1,6 +1,7 @@
 package com.example.Chatspringboot.common.exception;
 
 
+import com.example.Chatspringboot.domain.repository.Entity.Friend;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,8 +23,9 @@ public enum ErrorCode implements CoderInterface{
 
     ACCESS_TOKEN_IS_NOT_EXPIRED(-201,"token is not expired"),
 
-    TOKEN_EXPIRED(-202,"token is expired");
+    TOKEN_EXPIRED(-202,"token is expired"),
 
+    FriendAddRequest(-300,"SUCCESS_FRIEND_Request_ADD");
 
 
 

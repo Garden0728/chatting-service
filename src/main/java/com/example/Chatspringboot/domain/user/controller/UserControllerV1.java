@@ -48,4 +48,7 @@ public class UserControllerV1 {
         String user= JWTProvider.getUserFromtoken(token);
         return userServiceV1.searchUser(name, user);
     }
+
+   // public UserFriendRequestList
+
 }

@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController //해당 클래스가 REST API 컨트롤러임을 명시. //restController : 뷰를 반환하지 않고 항상 데이터를 반환한다.
 @RequestMapping("/api/v1/chat") //모든 요청 앞에 /api/v1/auth가 붙음.
 @RequiredArgsConstructor //Lombok이 final 필드인 ChatService를 자동으로 생성자 주입.
-public class ChatControllerV1 {
+public class
+
+ChatControllerV1 {
     private final ChatServiceV1 chatServiceV1;
 
     @Operation(
@@ -49,6 +51,7 @@ public class ChatControllerV1 {
         log.info("요청 들어옴 name: {}", name);
         return chatServiceV1.ChattingUserRecordList(name);
     }
+
 
 
 }

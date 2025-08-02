@@ -75,6 +75,9 @@ public class AuthService {
     public String getUsernameFromToken(String token) { //토큰 값을 넘겨주면서 그 값을 기반으로 username값을 가져온다
             return JWTProvider.getUserFromtoken(token);
     }
+    public Long getUserIdFromToken(String token) {
+        return JWTProvider.getUserIdFromToken(token);
+    }
 
     public LoginUserResponse Login(LoginUserRequest request) {
         Optional<User> user = userRepository.findByName(request.name());
@@ -104,7 +107,8 @@ public class AuthService {
         });
         //return new LoginUserResponse(ErrorCode.SUCCESS,"Token");
 
-        String token = JWTProvider.createRefreshToken(request.name());
+        //String token = JWTProvider.createRefreshToken(request.name());
+        String token = JWTProvider.createFriendRefreshToken(user.get().getId(),user.get().getName());
         System.out.println(token);
         return new LoginUserResponse(ErrorCode.SUCCESS,token);
 

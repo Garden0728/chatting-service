@@ -6,6 +6,7 @@ import com.example.Chatspringboot.domain.auth.Model.Request.LoginUserRequest;
 import com.example.Chatspringboot.domain.auth.Model.Response.CreateUserResponse;
 import com.example.Chatspringboot.domain.auth.Model.Response.LoginUserResponse;
 import com.example.Chatspringboot.domain.auth.Service.AuthService;
+import com.example.Chatspringboot.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,25 +29,27 @@ public class AuthControllerV1 {
 
     //Swagger 문서에 표시될 API 설명.
     @Operation( //swagger사용 , swagger : Swagger는 RESTful API를 문서화하고, 테스트하고, 설계할 수 있는 도구 면 Swagger UI에서 자동으로 POST /api/v1/user//Create-user 경로가 문서화
-                summary =  "새로운 유저를 생성합니다.", //간단한 설명
-                description =  "새로운 유저 생성" //자세한 설명
+            summary = "새로운 유저를 생성합니다.", //간단한 설명
+            description = "새로운 유저 생성" //자세한 설명
     )
     @PostMapping("/create-user")
     public CreateUserResponse createUser(
-        @RequestBody @Valid CreateUserRequest request //@RequestBody : Json 요청 데이터를 CreateUserRequest 객체로 맵핑 , @Vaild : 유효성 검사
-    ){
+            @RequestBody @Valid CreateUserRequest request //@RequestBody : Json 요청 데이터를 CreateUserRequest 객체로 맵핑 , @Vaild : 유효성 검사
+    ) {
         return authService.createUser(request);
     }
+
     @Operation(
             summary = "로그인 처리",
             description = "로그인을  진행합니다."
     )
     @PostMapping("/login")
     public LoginUserResponse login(
-          @RequestBody @Valid LoginUserRequest request
-    ){
+            @RequestBody @Valid LoginUserRequest request
+    ) {
         return authService.Login(request);
     }
+
     @Operation(
             summary = "get user name",
             description = "token을 기반으로 user를 가져옵니다."
@@ -59,7 +62,12 @@ public class AuthControllerV1 {
         return authService.getUsernameFromToken(token);
     }
 
-
-
-
+    @Operation(
+            summary = "get user id",
+            description = "token을 기반으로 userId를 가져옵니다."
+    )
+    @GetMapping("/verify-token-id/{token}")
+    public Long getUserIdFromToken(@PathVariable String token) {
+        return authService.getUserIdFromToken(token);
+    }
 }

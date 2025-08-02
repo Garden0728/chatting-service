@@ -59,7 +59,7 @@ public class JWTProvider {
 
 
     }
-    public static String createRefreshToken(String name) { // 추가 적인 필드를 추가 가능 대신에 형식은 맞춰라
+    public static String createRefreshToken(Long userID,String name) { // 추가 적인 필드를 추가 가능 대신에 형식은 맞춰라
         return JWT.create()
                 .withSubject(name)
                 .withIssuedAt(new Date()) //언제 발급이 되었는지
@@ -69,6 +69,18 @@ public class JWTProvider {
 
 
     }
+    public static String createFriendRefreshToken(Long userID,String name) { // 추가 적인 필드를 추가 가능 대신에 형식은 맞춰라
+        return JWT.create()
+                .withSubject(name)
+                .withClaim("userId", userID)
+                .withIssuedAt(new Date()) //언제 발급이 되었는지
+                .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenTimeForMinute * Constants.ON_MINUSTE_TOS_MILLIS)) //언제 이게 exprire 되는지
+                .sign(Algorithm.HMAC256(refreshSecretKey)); //어떤 암호화 알고리즘을 사용을 할거냐.
+        //안위적으로 Builder 패턴을 사용하게 된다.
+
+
+    }
+
     public static DecodedJWT checkTokenForRefresh(String token) { //ACCESS 토큰이 정상적으로 만료가 되어있어야만 정상적으로 동작
         try{
                 DecodedJWT decoded = JWT.require(Algorithm.HMAC256(secretKey)).build().verify(token); //secretKey기반으로 token값을 디코딩을 해봐라
@@ -121,6 +133,10 @@ public class JWTProvider {
         return jwt.getSubject();
 
     }
+    public static Long getUserIdFromToken(String token) {
+    DecodedJWT jwt = decodedJWT(token);
+    return jwt.getClaim("userId").asLong();
+}
 
     //  secret-key: "SECRET"
     //  refresh-secret-key: "REFRESH_SECRET"
