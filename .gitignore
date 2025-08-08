@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+
 ### STS ###
 .apt_generated
 .classpath
@@ -32,6 +33,12 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Node / Next.js (Client) ###
+AddFile/client/node_modules/
+AddFile/client/.next/
+AddFile/client/*.tsbuildinfo
+AddFile/client/.DS_Store
 
 ### VS Code ###
 .vscode/
