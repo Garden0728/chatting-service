@@ -24,6 +24,7 @@ import {ChatList} from "./chat/chat-list";
 import FriendRequests from "./friend/FriendRequests";
 
 interface SidebarProps {
+    onChangeChat: (user: User) => void;
     me: React.RefObject<string>;
     isCollapsed: boolean;
     links: User[];
@@ -78,14 +79,13 @@ export function Sidebar({
     const sendMessage = (newMessage: Message) => {
         setMessages((prev) => [...prev, newMessage]);
     };
-    const [tab, setTab] = useState<"chats" | "friends">("chats");
+    const [tab, setTab] = useState<"chats" | "friends">("friends");
 
     const [meId, setMeId] = useState<number | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [searchResults, setSearchResults] = useState<User[]>([]);
     const clientRef = useRef<StompJs.Client | null>(null);
-    // Sidebar 컴포넌트 내부에 이거 추가
     const [selectedUser, setSelectedUserState] = useState<User | null>(null);
 
     const openSearchModal = () => setShowModal(true);
@@ -178,9 +178,9 @@ export function Sidebar({
                 {tab === "friends" && (
                     <>
                         <FriendList
-                            links={links}
-                            setSelectedUser={setSelectedUser}
-                            setMessages={setMessages}
+
+                            onChangeChat={handleChangeChat}
+
                         />
                         <FriendRequests/>
 

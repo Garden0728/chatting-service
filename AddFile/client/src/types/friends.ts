@@ -15,3 +15,9 @@ export type SendRequest = {
   receiveID: number;
   createdAt: string;
 };
+/*
+export type friend = {
+  id : string
+  name : number;
+  createdAt: string;
+}*/
