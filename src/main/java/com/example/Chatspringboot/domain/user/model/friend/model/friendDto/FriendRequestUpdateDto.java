@@ -1,4 +1,4 @@
-package com.example.Chatspringboot.domain.user.friend.model.friendDto;
+package com.example.Chatspringboot.domain.user.model.friend.model.friendDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -1,10 +1,9 @@
-package com.example.Chatspringboot.domain.user.friend.model.friendDto;
+package com.example.Chatspringboot.domain.user.model.friend.model.friendDto;
 
 
 import com.example.Chatspringboot.common.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public record FriendTakeResponse (
@@ -17,8 +16,8 @@ public record FriendTakeResponse (
 ){
         public static record FriendInfo (
                 Long id,
-                String name,
-                LocalDateTime CreatedAt
+                String name
+               // LocalDateTime CreatedAt
 
         ){}
 }

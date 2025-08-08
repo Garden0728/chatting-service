@@ -1,4 +1,4 @@
-package com.example.Chatspringboot.domain.user.friend.service;
+package com.example.Chatspringboot.domain.user.model.friend.service;
 
 import com.example.Chatspringboot.common.exception.CustomException;
 import com.example.Chatspringboot.common.exception.ErrorCode;
@@ -6,10 +6,10 @@ import com.example.Chatspringboot.domain.repository.Entity.Friend;
 import com.example.Chatspringboot.domain.repository.Entity.User;
 import com.example.Chatspringboot.domain.repository.FriendRepository;
 import com.example.Chatspringboot.domain.repository.UserRepository;
-import com.example.Chatspringboot.domain.user.friend.model.friendDto.FriendRequestListResponse;
-import com.example.Chatspringboot.domain.user.friend.model.friendDto.FriendRequestUpdateDto;
-import com.example.Chatspringboot.domain.user.friend.model.friendDto.FriendResponse;
-import com.example.Chatspringboot.domain.user.friend.model.friendDto.FriendTakeResponse;
+import com.example.Chatspringboot.domain.user.model.friend.model.friendDto.FriendRequestListResponse;
+import com.example.Chatspringboot.domain.user.model.friend.model.friendDto.FriendRequestUpdateDto;
+import com.example.Chatspringboot.domain.user.model.friend.model.friendDto.FriendResponse;
+import com.example.Chatspringboot.domain.user.model.friend.model.friendDto.FriendTakeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -107,10 +107,12 @@ public class FriendService {
          List<FriendTakeResponse.FriendInfo> FriendInfoList  = friendList.stream()
                  .map(f -> {
                      User friendUser = f.getUser().equals(findUser) ? f.getFriend() : f.getUser();
+                     System.out.println(friendUser.getId());
+                      System.out.println(friendUser.getName() + "친구");
                      return new FriendTakeResponse.FriendInfo(
                              friendUser.getId(),
-                             friendUser.getName(),
-                             f.getCreatedAt()
+                             friendUser.getName()
+                            // f.getCreatedAt()
 
                      );
                  })
