@@ -1,4 +1,4 @@
-package com.example.Chatspringboot.domain.user.friend.model.friendDto;
+package com.example.Chatspringboot.domain.user.model.friend.model.friendDto;
 
 import com.example.Chatspringboot.common.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;

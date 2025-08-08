@@ -1,63 +1,39 @@
 "use client";
-
-
-import Link from "next/link";
-import {Search} from "lucide-react";
-import {cn} from "@/lib/utils";
-import {buttonVariants} from "@/components/ui/button";
-import type {ReceiveRequest} from "@/types/friends";
-import * as StompJs from "@stomp/stompjs";
-
-import {fetchInitialChatUsers} from "@/lib/sidebar_utils";
-// 상단 import에 추가 필요
-import {useEffect, useRef, useState} from "react";
-
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-    TooltipProvider,
-} from "@/components/ui/tooltip";
-import {Avatar, AvatarImage} from "./ui/avatar";
-import {User, Message} from "@/app/data";
-import React from "react";
-
-import {
+    Tabs,
+    Tab,
+    Box,
     Dialog,
-    DialogTitle,
     DialogContent,
-    DialogActions,
     TextField,
     IconButton,
     List,
     ListItem,
     ListItemText,
-    Button,
+    ListItemButton,
+    Button
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import "@mui/material/styles"; // MUI 스타일 추가
+import * as StompJs from "@stomp/stompjs";
+import {useEffect, useRef, useState} from "react";
+import {User, Message} from "@/app/data";
 import api from "@/lib/axios";
 
+import FriendList from "./friend/FriendList";
+import {ChatList} from "./chat/chat-list";
+import FriendRequests from "./friend/FriendRequests";
+
 interface SidebarProps {
-    me: React.RefObject<String>;
+    onChangeChat: (user: User) => void;
+    me: React.RefObject<string>;
     isCollapsed: boolean;
     links: User[];
     setConnectedUsers: React.Dispatch<React.SetStateAction<User[]>>;
     setSelectedUser: React.Dispatch<React.SetStateAction<User | null>>;
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-
+    messages: Message[];
 }
 
-
-/*
-const searchResult = (name: string): User => {
-    return {
-        name,
-        messages: [], // 기본값으로 빈 배열
-
-    };
-};
-*/
 
 const getCookie = (name: string): string | null => {
     const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
@@ -96,129 +72,32 @@ export function Sidebar({
                             setConnectedUsers,
                             setSelectedUser,
                             setMessages,
+                            messages
                         }: SidebarProps) {
-    const [tab,setTab] = useState<"chats" | "friends">("chats");
-    const [showModal, setShowModal] = React.useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = React.useState<string>("");
-    const [searchResults, setSearchResults] = React.useState<User[]>([]);
-    const [friendRequests, setFriendRequests] = React.useState<ReceiveRequest[]>([]);
+
+
+    const sendMessage = (newMessage: Message) => {
+        setMessages((prev) => [...prev, newMessage]);
+    };
+    const [tab, setTab] = useState<"chats" | "friends">("friends");
+
     const [meId, setMeId] = useState<number | null>(null);
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [searchResults, setSearchResults] = useState<User[]>([]);
     const clientRef = useRef<StompJs.Client | null>(null);
-    useEffect(() => {
-        const token = getCookie("auth");
-        if (!token) return;
+    const [selectedUser, setSelectedUserState] = useState<User | null>(null);
 
-        api.get(`/api/v1/auth/verify-token-id/${token}`).then((res) => {
-            setMeId(res.data);  // 서버에서 userId(Long) 반환
-        });
-    }, []);
-
-    useEffect(() => {
-        const token = getCookie("auth");
-        if (!token) return;
-
-        // 친구 리스트 가져오기
-        // api.get("/api/v1/friend/list", {
-        //     headers: {Authorization: `Bearer ${token}`}
-        // }).then(res => {
-        //     setConnectedUsers(res.data.FriendList); // 서버 응답 필드 이름 맞춰서 변경
-        // });
-
-        // 친구 요청 리스트 가져오기
-        api.get("/api/v1/friend/Take-Request-friend", {
-            headers: {Authorization: `Bearer ${token}`}
-        }).then(res => {
-            setFriendRequests(res.data.UserList);
-        });
-    }, []);
-
-    useEffect(() => {
-        if (!meId) return;
-
-        const c = new StompJs.Client({
-            brokerURL: "ws://localhost:7002/ws-stomp",
-            reconnectDelay: 5000,
-        });
-
-        c.onConnect = () => {
-            c.subscribe(`/sub/friend/${meId}`, (message) => {
-                const data = JSON.parse(message.body);
-                setFriendRequests((prev) => [
-                    ...prev,
-                    {
-                        name: data.senderName,
-                        sendID: data.senderId,
-                        receiveID: data.receiverId,
-                        createdAt: data.createdAt,
-                    },
-                ]);
-            });
-        };
-        c.activate();
-        clientRef.current = c;
-
-        return () => {
-            if (clientRef.current) {
-                clientRef.current.deactivate(); // Promise지만 무시하고 호출
-            }
-
-        };
-
-        /*fetchInitialChatUsers(setConnectedUsers, setFriendRequests);*/
-    }, [meId]);
-
-    /*useEffect(() => {
-        console.log("💡 friendRequests updated", friendRequests);
-    }, [friendRequests]);*/
-
-    // useEffect(() => {
-    //     const fetchInitialChatUsers = async () => {
-    //         const token = getCookie("auth");
-    //         if (!token) return;
-    //
-    //         const meRes = await api.get(`/api/v1/auth/verify-token/${token}`);
-    //         const userName = meRes.data;
-    //
-    //         const res = await api.get("/api/v1/chat/chat-record", {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //             params: {
-    //                 name: userName,
-    //             },
-    //         });
-    //
-    //         const userList = res.data.name.map((n: string) => ({
-    //             name: n,
-    //             messages: [],
-    //         }));
-    //
-    //         setConnectedUsers(userList);
-    //     };
-    //
-    //     fetchInitialChatUsers();
-    // }, []);
-
-    const handleSearch = () => {
-        setShowModal(true);
+    const openSearchModal = () => setShowModal(true);
+    const closeModal = () => setShowModal(false);
+    const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+        setTab(newValue as "chats" | "friends");
     };
-
-    const closeModal = () => {
-        setShowModal(false);
-    };
-
-    const handleSearchQueryChange = async (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        const query = event.target.value;
-
-        setSearchQuery(query);
-    };
-
-    const handelSearchButton = async (event: any) => {
+    const handleSearch = async () => {
         const users = await fetchUsers(searchQuery);
         setSearchResults(users);
-    };
+
+    }
     const handleAddFriend = async (friendId: number) => {
         try {
             const token = getCookie("auth");
@@ -228,98 +107,123 @@ export function Sidebar({
                 },
             });
             alert("친구 요청 보냈습니다!");
-            const frRes = await api.get("/api/v1/friend/Take-Request-friend", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-
-                },
-            });
-            setFriendRequests(frRes.data.UserList);
         } catch (error) {
             console.error("친구 요청 실패", error);
             alert("요청 실패");
         }
     };
-
-
-    const addFriends = async (user: User) => {
-        setConnectedUsers((prevUsers) => {
-            // user.id가 이미 prevUsers 배열에 있는지 확인
-            const userExists = prevUsers.some(
-                (existingUser) => existingUser.name === user.name
-            );
-
-            if (userExists) {
-                // 이미 존재하는 경우 아무것도 하지 않음
-                return prevUsers;
-            }
-
-            // 존재하지 않는 경우에만 추가
-            return [...prevUsers, user];
-        });
-    };
-
-    const handleChangeChat = async (link: User) => {
+    const handleChangeChat = async (user: User) => {
         const result = await api.get("/api/v1/chat/chat-list", {
             params: {
-                name: link.name,
+                name: user.name,
                 from: me.current,
             },
         });
 
         setMessages(result.data.result);
 
-        window.localStorage.setItem("selectedUser", JSON.stringify(link));
-        setSelectedUser(link);
+        window.localStorage.setItem("selectedUser", JSON.stringify(user)); //link 객체를 json 형태로 저장해서 새로고침 후에도 창을 그대로 유지 하기 위해
+        setSelectedUser(user);
+        setSelectedUserState(user);
+        setConnectedUsers((prev) => {
+            if (prev.find((u) => u.id === user.id)) return prev;
+            return [...prev, user];
+        });
     };
 
 
+    useEffect(() => {
+        const token = getCookie("auth");
+        if (!token) return;
+
+        api.get(`/api/v1/auth/verify-token-id/${token}`).then((res) => {
+            setMeId(res.data);  // 서버에서 userId(Long) 반환
+        });
+    }, []);
+
 
     return (
-        <div
-            data-collapsed={isCollapsed}
-            className="relative group flex flex-col h-full gap-4 p-2 data-[collapsed=true]:p-2 "
-        >
+        <div className="flex flex-col h-full">
+            {/* ✅ 탭 전환 */}
+            <Box sx={{borderBottom: 1, borderColor: "divider"}}>
+                <Tabs
+                    value={tab}
+                    onChange={handleTabChange}
+                    textColor="secondary"
+                    indicatorColor="secondary"
+                    variant="fullWidth"
+                >
+                    <Tab label="채팅방" value="chats"/>
+                    <Tab label="친구목록" value="friends"/>
+                </Tabs>
+            </Box>
+
+            {tab === "friends" && (
+                <div className="flex justify-end p-2">
+                    <IconButton onClick={openSearchModal}>
+                        <SearchIcon/>
+                    </IconButton>
+                </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto">
+                {tab === "chats" && selectedUser &&(
+                    <ChatList
+                        me={me}
+                        messages={messages}
+                        selectedUser={selectedUser}
+                        sendMessage={sendMessage}
+                    />
+                )}
+                {tab === "friends" && (
+                    <>
+                        <FriendList
+
+                            onChangeChat={handleChangeChat}
+
+                        />
+                        <FriendRequests/>
+
+                    </>
+                )}
+            </div>
+
             <Dialog open={showModal} onClose={closeModal} maxWidth="sm" fullWidth>
                 <DialogContent>
-                    <div className="flex items-center">
-                        <TextField
-                            fullWidth
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={handleSearchQueryChange}
-                            InputProps={{
-                                endAdornment: (
-                                    <IconButton edge="end" color="primary">
-                                        <SearchIcon onClick={handelSearchButton}/>
-                                    </IconButton>
-                                ),
-                            }}
-                        />
-                    </div>
+                    <TextField
+                        fullWidth
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        InputProps={{
+                            endAdornment: (
+                                <IconButton onClick={handleSearch}>
+                                    <SearchIcon/>
+                                </IconButton>
+                            ),
+                        }}
+                    />
                     <List>
                         {searchResults.length > 0 ? (
-                            searchResults.map((user, index) => (
+                            searchResults.map((user) => (
                                 <ListItem
-                                    key={index}
-                                    onClick={() => handleChangeChat(user)}
+                                    key={user.id}
+                                    component="button"
+                                    onClick={() => {
+                                        handleChangeChat(user); // 친구 추가 없이도 바로 채팅 시작
+                                        closeModal();
+                                    }}
                                     secondaryAction={
                                         <Button
                                             variant="contained"
                                             size="small"
-                                            style={{
-                                                backgroundColor: "blueviolet",
-                                                color: "white",
-                                            }}
                                             onClick={(e) => {
-                                                e.stopPropagation();
+                                                e.stopPropagation(); //친구 추가 클릭 시 채팅 이벤트 막음
                                                 handleAddFriend(user.id);
                                             }}
                                         >
                                             +
                                         </Button>
-
-
                                     }
                                 >
                                     <ListItemText primary={user.name}/>
@@ -333,97 +237,6 @@ export function Sidebar({
                     </List>
                 </DialogContent>
             </Dialog>
-            {!isCollapsed && (
-                <div className="flex justify-between p-2 items-center">
-                    <div className="flex gap-2 items-center text-2xl">
-                        <p className="font-medium">Chats</p>
-                        <span className="text-zinc-300">({links.length})</span>
-                    </div>
-
-                    <div>
-                        <Link
-                            href="#"
-                            className={cn(
-                                buttonVariants({variant: "ghost", size: "icon"}),
-                                "h-9 w-9"
-                            )}
-                        >
-                            <Search size={20} onClick={handleSearch}/>
-                        </Link>
-                    </div>
-                </div>
-            )}
-            <nav
-                className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
-                {links.map((link, index) =>
-                    isCollapsed ? (
-                        <TooltipProvider key={index}>
-                            <Tooltip key={index} delayDuration={0}>
-                                <TooltipTrigger asChild>
-                                    <Link
-                                        href="#"
-                                        className={cn(
-                                            buttonVariants({variant: "grey", size: "icon"}),
-                                            "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                                        )}
-                                    >
-                                        <span className="sr-only">{link.name}</span>
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent
-                                    side="right"
-                                    className="flex items-center gap-4"
-                                >
-                                    {link.name}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    ) : (
-                        <Link
-                            key={index}
-                            href="#"
-                            className={cn(
-                                buttonVariants({variant: "grey", size: "xl"}), // link.variant === "grey" &&
-                                "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white shrink"
-                            )}
-                            onClick={() => {
-                                handleChangeChat(link);
-                            }}
-                        >
-                            <div className="flex flex-col max-w-28">
-                                <span>{link.name}</span>
-                                {link.messages.length > 0 && (
-                                    <span className="text-zinc-300 text-xs truncate ">
-                    {link.messages[link.messages.length - 1].from.split(" ")[0]}
-                                        : {link.messages[link.messages.length - 1].message}
-                  </span>
-                                )}
-                            </div>
-                        </Link>
-                    )
-                )}
-            </nav>
-            {friendRequests.length > 0 && (
-                <div className="px-2">
-                    <p className="text-sm font-semibold mb-2">받은 친구 요청</p>
-                    <ul className="space-y-1">
-                        {friendRequests.map((req) => (
-                            <li key={req.sendID}
-                                className="bg-muted rounded px-3 py-2 flex justify-between items-center">
-                                <span>{req.name}</span>
-                                <div className="flex space-x-1">
-                                    <button className="text-green-500 text-sm hover:underline">수락</button>
-                                    <button className="text-red-500 text-sm hover:underline">거절</button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
         </div>
-
-
-
     );
 }

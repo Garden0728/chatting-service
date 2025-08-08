@@ -1,9 +1,9 @@
-package com.example.Chatspringboot.domain.user.friend.controller;
+package com.example.Chatspringboot.domain.user.model.friend.controller;
 
-import com.example.Chatspringboot.domain.user.friend.service.FriendService;
-import com.example.Chatspringboot.domain.user.friend.model.friendDto.FriendRequestListResponse;
-import com.example.Chatspringboot.domain.user.friend.model.friendDto.FriendResponse;
-import com.example.Chatspringboot.domain.user.friend.model.friendDto.FriendTakeResponse;
+import com.example.Chatspringboot.domain.user.model.friend.service.FriendService;
+import com.example.Chatspringboot.domain.user.model.friend.model.friendDto.FriendRequestListResponse;
+import com.example.Chatspringboot.domain.user.model.friend.model.friendDto.FriendResponse;
+import com.example.Chatspringboot.domain.user.model.friend.model.friendDto.FriendTakeResponse;
 import com.example.Chatspringboot.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
