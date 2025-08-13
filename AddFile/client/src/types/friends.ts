@@ -4,12 +4,14 @@ export type FriendRequestListResponse = {
   friendRequestList: SendRequest[];
 };
 export type ReceiveRequest = {
+  id : number;
   name: string;
   sendID: number;
   receiveID: number;
   createdAt: string;
 };
 export type SendRequest = {
+  id : number;
   name: string;
   sendID: number;
   receiveID: number;
