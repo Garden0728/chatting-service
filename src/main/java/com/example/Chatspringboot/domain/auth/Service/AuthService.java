@@ -32,7 +32,6 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final Hasher hasher;
-    private final PlatformTransactionManager createUserTransactionManager;
 
     @Transactional(transactionManager = "createUserTransactionManager")
     public CreateUserResponse createUser(CreateUserRequest request) {

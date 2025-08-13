@@ -1,4 +1,4 @@
-package com.example.Chatspringboot.domain.auth.Service;
+package com.example.Chatspringboot.domain.chat.service;
 
 
 import com.example.Chatspringboot.common.exception.ErrorCode;

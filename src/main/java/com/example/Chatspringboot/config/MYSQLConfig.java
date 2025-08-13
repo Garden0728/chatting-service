@@ -2,10 +2,11 @@ package com.example.Chatspringboot.config;
 
 
 import jakarta.persistence.EntityManagerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -29,25 +30,26 @@ public class MYSQLConfig {
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
 
-    @Bean
-    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
-        return new DataSourceTransactionManager(dataSource);
-    }
-    @Bean
-    public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
-        return new TransactionTemplate(transactionManager);
+
+
+    @Bean(name = "transactionManager")
+
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+        return new JpaTransactionManager(emf);
     }
 
-    @Bean(name="createChatTransactionManager") //PlatformTransactionManager spring 트랜잭션 상위 인터페이스 JpaTransactionManager : JPA 전용 구현체
-    public PlatformTransactionManager createChatTransactionManager(EntityManagerFactory entityManagerFactory) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory);
-        return transactionManager;
+    @Bean(name="createUserTransactionManager")
+    @Primary//PlatformTransactionManager spring 트랜잭션 상위 인터페이스 JpaTransactionManager : JPA 전용 구현체
+    public PlatformTransactionManager createUserTransactionManager(EntityManagerFactory emf) {
+         return new JpaTransactionManager(emf);
     }
-    @Bean(name = "createUserTransactionManager")
-    public PlatformTransactionManager createUserTransactionManager(DataSource dataSource) {
-        DataSourceTransactionManager manager = new DataSourceTransactionManager(dataSource);
-        return manager;
+    @Bean(name = "createChatTransactionManager")
+    public PlatformTransactionManager createChatTransactionManager(EntityManagerFactory emf) {
+         return new JpaTransactionManager(emf);
+    }
+    @Bean
+    public TransactionTemplate transactionTemplate( @Qualifier("createUserTransactionManager") PlatformTransactionManager txManager) {
+        return new TransactionTemplate(txManager);
     }
 
 }

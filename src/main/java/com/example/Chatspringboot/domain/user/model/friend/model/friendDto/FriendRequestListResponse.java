@@ -18,10 +18,11 @@ public record FriendRequestListResponse(
         List<FriendRequestListResponse.sendList> friendRequestList
 
 
-
-
 ) {
     public static record sendList(
+            @Schema(description = "친구요청 id")
+            Long id,
+
             @Schema(description = "상대 유저 이름")
             String name,
 
@@ -37,7 +38,9 @@ public record FriendRequestListResponse(
     ) {
     }
 
-      public static record receiveList(
+    public static record receiveList(
+            @Schema(description = "친구요청 id")
+            Long id,
             @Schema(description = "상대 유저 이름")
             String name,
 

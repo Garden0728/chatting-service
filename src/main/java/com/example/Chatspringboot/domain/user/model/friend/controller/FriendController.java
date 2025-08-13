@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class FriendController {
     private final FriendService friendService;
-     @Operation(
+
+    @Operation(
             summary = "Friend Request",
             description = "User ID 기반으로 친구 신청"
     )
@@ -32,24 +34,26 @@ public class FriendController {
             @PathVariable("friendId") Long targetID,
             @RequestHeader("Authorization") String authString
     ) {
-         String token = JWTProvider.extractToken(authString);
-         Long RequestId = JWTProvider.getUserIdFromToken(token);
+        String token = JWTProvider.extractToken(authString);
+        Long RequestId = JWTProvider.getUserIdFromToken(token);
 
-         return friendService.friendRequestSave(RequestId,targetID);
+        return friendService.friendRequestSave(RequestId, targetID);
     }
+
     @Operation(
             summary = "Friend Request list",
-            description =  "User ID기반으로 친구요청 보낸 목록 및 받은 목록 리스트"
+            description = "User ID기반으로 친구요청 보낸 목록 및 받은 목록 리스트"
     )
     @GetMapping("/Take-Request-friend")
     public FriendRequestListResponse takeFriendRequestlist(
             @RequestHeader("Authorization") String authString
-    ){
-         String token = JWTProvider.extractToken(authString);
-         Long UserID = JWTProvider.getUserIdFromToken(token);
+    ) {
+        String token = JWTProvider.extractToken(authString);
+        Long UserID = JWTProvider.getUserIdFromToken(token);
 
-         return friendService.GetFriendRequestList(UserID);
+        return friendService.GetFriendRequestList(UserID);
     }
+
     @Operation(
             summary = "Friend list",
             description = "User 기반으로 유저의 친구목록 리스트를 가져옴."
@@ -58,11 +62,28 @@ public class FriendController {
     public FriendTakeResponse TakeFriendList(
             @RequestHeader("Authorization") String authString
 
-    ){
-         String token = JWTProvider.extractToken(authString);
-         Long UserID = JWTProvider.getUserIdFromToken(token);
+    ) {
+        String token = JWTProvider.extractToken(authString);
+        Long UserID = JWTProvider.getUserIdFromToken(token);
 
-         return friendService.GetFriendList(UserID);
+        return friendService.GetFriendList(UserID);
+    }
+
+    @Operation(
+            summary = "FriendRequest change accept",
+            description = "친구요청 수락여부 변경."
+    )
+    @PutMapping("/accept/{friendId}")
+    public FriendTakeResponse changeFriend(
+            @PathVariable("friendId") Long friendId,
+            @RequestHeader("Authorization") String authString
+
+    ) {
+        String token = JWTProvider.extractToken(authString);
+
+        Long UserID = JWTProvider.getUserIdFromToken(token);
+
+        return friendService.ChangeFriendRequest_accept(UserID, friendId);
     }
 
 

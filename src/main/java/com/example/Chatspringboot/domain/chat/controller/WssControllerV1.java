@@ -1,8 +1,7 @@
 package com.example.Chatspringboot.domain.chat.controller;
 
-import com.example.Chatspringboot.domain.auth.Service.ChatServiceV1;
+import com.example.Chatspringboot.domain.chat.service.ChatServiceV1;
 import com.example.Chatspringboot.domain.chat.model.Message;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

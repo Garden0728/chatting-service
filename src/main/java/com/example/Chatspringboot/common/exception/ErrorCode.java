@@ -25,8 +25,13 @@ public enum ErrorCode implements CoderInterface{
 
     TOKEN_EXPIRED(-202,"token is expired"),
 
-    FriendAddRequest(-300,"SUCCESS_FRIEND_Request_ADD");
+    FriendAddRequest(100,"SUCCESS_FRIEND_Request_ADD"),
+    FriendACCEPT(101,"SUCCESS_FRIEND_Accept"),
 
+
+    FRIEND_REQUEST_NO_FOUND(-300,"SUCCESS_FRIEND_Request_NO_FIND OR Already accepted"),
+    FRIEND_ACCEPT_NO_AUTHORITY(-301,"NO CHANGE FRIEND_ACCEPT_NO_AUTHORITY"),
+    FRIEND_REQUEST_NOT_SAVE(-302,"ALREADY_HAVE_FRIEND");
 
 
     private final Integer code;

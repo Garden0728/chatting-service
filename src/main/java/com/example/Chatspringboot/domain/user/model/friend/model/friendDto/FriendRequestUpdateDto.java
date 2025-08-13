@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public record FriendRequestUpdateDto(
         @Schema(description = "sub을 구독한 클라이언트에 보내는 친구요청 dto")
+
         Long senderId,
 
         String senderName,
