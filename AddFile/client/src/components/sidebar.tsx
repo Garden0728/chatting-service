@@ -10,30 +10,25 @@ import {
     List,
     ListItem,
     ListItemText,
-    ListItemButton,
-    Button
+    Button,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import * as StompJs from "@stomp/stompjs";
 import {useEffect, useRef, useState} from "react";
 import {User, Message} from "@/app/data";
 import api from "@/lib/axios";
+import {useChatActions} from "@/context/ChatActionsContext";
 
 import FriendList from "./friend/FriendList";
 import {ChatList} from "./chat/chat-list";
 import FriendRequests from "./friend/FriendRequests";
 
 interface SidebarProps {
-    onChangeChat: (user: User) => void;
-    me: React.RefObject<string>;
+    me: string | null;
     isCollapsed: boolean;
     links: User[];
-    setConnectedUsers: React.Dispatch<React.SetStateAction<User[]>>;
-    setSelectedUser: React.Dispatch<React.SetStateAction<User | null>>;
-    setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
     messages: Message[];
 }
-
 
 const getCookie = (name: string): string | null => {
     const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
@@ -43,68 +38,51 @@ const getCookie = (name: string): string | null => {
 
 export const fetchUsers = async (searchQuery: string): Promise<User[]> => {
     const token = getCookie("auth");
-
     if (!token) {
         throw new Error("Authentication token not found in cookies");
     }
-
     const response = await api.get(`/api/v1/user/search/${searchQuery}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        headers: {Authorization: `Bearer ${token}`},
     });
 
     return response.data.users.map((user: { id: number; name: string }) => ({
         id: user.id,
         name: user.name,
         messages: [],
-
     }));
-    /*const names = response.data.name;
-
-    return names.map((n: string) => searchResult(n));*/
 };
 
-export function Sidebar({
-                            me,
-                            links,
-                            isCollapsed,
-                            setConnectedUsers,
-                            setSelectedUser,
-                            setMessages,
-                            messages
-                        }: SidebarProps) {
-
+export function Sidebar({me, links, isCollapsed, messages}: SidebarProps) {
+    // ✅ Context에서 세터 함수들 받아오기
+    const {setConnectedUsers, setSelectedUser, setMessages, onChangeChat} =
+        useChatActions();
 
     const sendMessage = (newMessage: Message) => {
         setMessages((prev) => [...prev, newMessage]);
     };
-    const [tab, setTab] = useState<"chats" | "friends">("friends");
 
+    const [tab, setTab] = useState<"chats" | "friends">("friends");
     const [meId, setMeId] = useState<number | null>(null);
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [showModal, setShowModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<User[]>([]);
     const clientRef = useRef<StompJs.Client | null>(null);
     const [selectedUser, setSelectedUserState] = useState<User | null>(null);
-
     const openSearchModal = () => setShowModal(true);
     const closeModal = () => setShowModal(false);
-    const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+    const handleTabChange = (_: React.SyntheticEvent, newValue: string) =>
         setTab(newValue as "chats" | "friends");
-    };
+
     const handleSearch = async () => {
         const users = await fetchUsers(searchQuery);
         setSearchResults(users);
+    };
 
-    }
     const handleAddFriend = async (friendId: number) => {
         try {
             const token = getCookie("auth");
             await api.post(`/api/v1/friend/add/${friendId}`, null, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: {Authorization: `Bearer ${token}`},
             });
             alert("친구 요청 보냈습니다!");
         } catch (error) {
@@ -112,35 +90,33 @@ export function Sidebar({
             alert("요청 실패");
         }
     };
-    const handleChangeChat = async (user: User) => {
+    const handleChangeChat = (user: User) => onChangeChat(user);
+   /* const handleChangeChat =  (user: User) => {
         const result = await api.get("/api/v1/chat/chat-list", {
             params: {
                 name: user.name,
-                from: me.current,
+                from: me, // ✅ 더 이상 me.current 아님
             },
         });
 
         setMessages(result.data.result);
+        window.localStorage.setItem("selectedUser", JSON.stringify(user));
 
-        window.localStorage.setItem("selectedUser", JSON.stringify(user)); //link 객체를 json 형태로 저장해서 새로고침 후에도 창을 그대로 유지 하기 위해
-        setSelectedUser(user);
+        setSelectedUser(user); // Context 세터
         setSelectedUserState(user);
         setConnectedUsers((prev) => {
             if (prev.find((u) => u.id === user.id)) return prev;
             return [...prev, user];
         });
-    };
-
+    };*/
 
     useEffect(() => {
         const token = getCookie("auth");
         if (!token) return;
-
         api.get(`/api/v1/auth/verify-token-id/${token}`).then((res) => {
-            setMeId(res.data);  // 서버에서 userId(Long) 반환
+            setMeId(res.data);
         });
     }, []);
-
 
     return (
         <div className="flex flex-col h-full">
@@ -167,7 +143,7 @@ export function Sidebar({
             )}
 
             <div className="flex-1 overflow-y-auto">
-                {tab === "chats" && selectedUser &&(
+                {tab === "chats" && selectedUser && (
                     <ChatList
                         me={me}
                         messages={messages}
@@ -177,13 +153,8 @@ export function Sidebar({
                 )}
                 {tab === "friends" && (
                     <>
-                        <FriendList
-
-                            onChangeChat={handleChangeChat}
-
-                        />
+                        <FriendList/>
                         <FriendRequests/>
-
                     </>
                 )}
             </div>
@@ -210,15 +181,16 @@ export function Sidebar({
                                     key={user.id}
                                     component="button"
                                     onClick={() => {
-                                        handleChangeChat(user); // 친구 추가 없이도 바로 채팅 시작
+                                        handleChangeChat(user);
                                         closeModal();
                                     }}
                                     secondaryAction={
                                         <Button
                                             variant="contained"
                                             size="small"
+                                            className="!bg-blue-600 !text-white hover:!bg-blue-700"
                                             onClick={(e) => {
-                                                e.stopPropagation(); //친구 추가 클릭 시 채팅 이벤트 막음
+                                                e.stopPropagation();
                                                 handleAddFriend(user.id);
                                             }}
                                         >

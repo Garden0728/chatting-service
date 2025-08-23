@@ -18,7 +18,7 @@ import { EmojiPicker } from "../emoji-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 interface ChatBottombarProps {
-  me: React.RefObject<string>;
+  me: string | null;
   selectedUser: User;
   sendMessage: (newMessage: Message) => void;
 }
@@ -38,9 +38,9 @@ export default function ChatBottombar({
   };
 
   const handleSend = () => {
-    if (message.trim() && me.current != null) {
+    if (message.trim() && me != null) {
       const newMessage: Message = {
-        from: me.current,
+        from: me,
         to: selectedUser.name,
         message: message.trim(),
       };
@@ -111,14 +111,7 @@ export default function ChatBottombar({
             className=" w-full border rounded-full flex items-center h-9 resize-none overflow-hidden bg-background"
           ></Textarea>
           <div className="absolute right-2 bottom-0.5  ">
-            <EmojiPicker
-              onChange={(value) => {
-                setMessage(message + value);
-                if (inputRef.current) {
-                  inputRef.current.focus();
-                }
-              }}
-            />
+            <EmojiPicker />
           </div>
         </motion.div>
       </AnimatePresence>

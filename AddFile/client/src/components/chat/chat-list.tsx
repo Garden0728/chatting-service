@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Client } from "@stomp/stompjs";
 
 interface ChatListProps {
-  me: React.RefObject<string>;
+  me: string | null;
   messages?: Message[];
   selectedUser: User;
   sendMessage: (newMessage: Message) => void;

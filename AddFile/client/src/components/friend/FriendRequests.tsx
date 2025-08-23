@@ -41,16 +41,25 @@ export default function FriendRequests() {
     }, [token]); //처음 로드 요청 리스트
     const accept = useCallback(async (friendId: number) => {
         try {
-            await api.put(`/api/v1/friend/accept/${friendId}`, null, {
+            await api.put(`/api/v1/friend/${friendId}/accept`, null, {
                 headers: {Authorization: `Bearer ${token}`},
             });
-            alert("친구요청이 수락되었습니다!");
             await refetch();
         } catch {
             alert("수락 실패");
         }
     }, [token, refetch]);
 
+    const reject = useCallback(async (friendId: number) => {
+        try {
+            await api.delete(`/api/v1/friend/${friendId}/reject`,{
+                headers: {Authorization: `Bearer ${token}`},
+            });
+            await refetch();
+        } catch {
+            alert("거절 실패");
+        }
+    }, [token, refetch]);
 
     useEffect(() => {
         if (!meId) return;
@@ -62,10 +71,12 @@ export default function FriendRequests() {
         });
 
         c.onConnect = () => {
-            c.subscribe(`/sub/friend/${meId}`, (message) => {
+            c.subscribe(`/sub/friend/request${meId}`, (message) => {
+                alert("새로운 친구요청이 들어왔습니다!")
                 refetch();
             });
         };
+
         c.activate();
         clientRef.current = c;
 
@@ -81,34 +92,36 @@ export default function FriendRequests() {
     return (
         <div className="p-2">
             <p className="text-sm font-semibold mb-2">받은 친구 요청</p>
-            <ul className="space-y-1">
-                {friendRequests.map((req) => (
-                    <li
-                        key={req.id}
-                        className="bg-muted rounded px-3 py-2 flex justify-between items-center"
-                    >
-                        <span>{req.name}</span>
-                        <div className="flex space-x-2">
-                            {/* ⚠️ 여기서 'req.friendId'가 진짜 요청 PK여야 함 */}
-                            <button
-                                className="text-green-600 text-sm hover:underline"
-                                onClick={() => accept(req.id)}
-                            >
-                                수락
-                            </button>
-                            <button
-                                className="text-red-600 text-sm hover:underline"
-                                //onClick={() => reject((req as any).friendId)}
-                            >
-                                거절
-                            </button>
-                        </div>
-                    </li>
-                ))}
-                {friendRequests.length === 0 && (
-                    <li className="text-xs text-muted-foreground">요청이 없습니다.</li>
-                )}
-            </ul>
+            <div className="max-h-64 overflow-y-scroll  pr-2">
+                <ul className="space-y-1">
+                    {friendRequests.map((req) => (
+                        <li
+                            key={req.id}
+                            className="bg-muted rounded px-3 py-2 flex justify-between items-center"
+                        >
+                            <span>{req.name}</span>
+                            <div className="flex space-x-2">
+                                {/* ⚠️ 여기서 'req.friendId'가 진짜 요청 PK여야 함 */}
+                                <button
+                                    className="text-green-600 text-sm hover:underline"
+                                    onClick={() => accept(req.id)}
+                                >
+                                    수락
+                                </button>
+                                <button
+                                    className="text-red-600 text-sm hover:underline"
+                                    onClick={() => reject(req.id)}
+                                >
+                                    거절
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                    {friendRequests.length === 0 && (
+                        <li className="text-xs text-muted-foreground">요청이 없습니다.</li>
+                    )}
+                </ul>
+            </div>
         </div>
     );
 }

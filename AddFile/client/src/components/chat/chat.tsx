@@ -6,8 +6,8 @@ import { Client } from "@stomp/stompjs";
 
 interface ChatProps {
   messagesState: Message[];
-  me: React.RefObject<string>;
-  client: Client;
+  me: string | null;
+  client: Client | null;
   selectedUser: User;
   setSelectedUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
@@ -24,7 +24,7 @@ export function Chat({
   const sendMessage = (newMessage: Message) => {
     if (client) {
       client.publish({
-        destination: `/pub/chat/message/${me.current}`,
+        destination: `/pub/chat/message/${me}`,
         body: JSON.stringify(newMessage),
       });
 
