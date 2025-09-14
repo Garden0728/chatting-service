@@ -6,9 +6,11 @@ import api from "@/lib/axios";
 import * as StompJs from "@stomp/stompjs";
 import {useChatActions} from "@/context/ChatActionsContext";
 
+/*
 interface FriendListProps {
     onChangeChat: (user: User) => void;
 }
+*/
 
 
 export default function FriendList() {

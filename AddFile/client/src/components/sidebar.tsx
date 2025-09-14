@@ -18,7 +18,7 @@ import {useEffect, useRef, useState} from "react";
 import {User, Message} from "@/app/data";
 import api from "@/lib/axios";
 import {useChatActions} from "@/context/ChatActionsContext";
-
+import ChatRooms from "./chat/chat-rooms";
 import FriendList from "./friend/FriendList";
 import {ChatList} from "./chat/chat-list";
 import FriendRequests from "./friend/FriendRequests";
@@ -91,24 +91,24 @@ export function Sidebar({me, links, isCollapsed, messages}: SidebarProps) {
         }
     };
     const handleChangeChat = (user: User) => onChangeChat(user);
-   /* const handleChangeChat =  (user: User) => {
-        const result = await api.get("/api/v1/chat/chat-list", {
-            params: {
-                name: user.name,
-                from: me, // ✅ 더 이상 me.current 아님
-            },
-        });
+    /* const handleChangeChat =  (user: User) => {
+         const result = await api.get("/api/v1/chat/chat-list", {
+             params: {
+                 name: user.name,
+                 from: me, // ✅ 더 이상 me.current 아님
+             },
+         });
 
-        setMessages(result.data.result);
-        window.localStorage.setItem("selectedUser", JSON.stringify(user));
+         setMessages(result.data.result);
+         window.localStorage.setItem("selectedUser", JSON.stringify(user));
 
-        setSelectedUser(user); // Context 세터
-        setSelectedUserState(user);
-        setConnectedUsers((prev) => {
-            if (prev.find((u) => u.id === user.id)) return prev;
-            return [...prev, user];
-        });
-    };*/
+         setSelectedUser(user); // Context 세터
+         setSelectedUserState(user);
+         setConnectedUsers((prev) => {
+             if (prev.find((u) => u.id === user.id)) return prev;
+             return [...prev, user];
+         });
+     };*/
 
     useEffect(() => {
         const token = getCookie("auth");
@@ -143,14 +143,19 @@ export function Sidebar({me, links, isCollapsed, messages}: SidebarProps) {
             )}
 
             <div className="flex-1 overflow-y-auto">
-                {tab === "chats" && selectedUser && (
-                    <ChatList
-                        me={me}
-                        messages={messages}
-                        selectedUser={selectedUser}
-                        sendMessage={sendMessage}
-                    />
+                {tab === "chats" && (
+                    selectedUser ? (
+                        <ChatList
+                            me={me}
+                            messages={messages}
+                            selectedUser={selectedUser}
+                            sendMessage={sendMessage}
+                        />
+                    ) : (
+                        <ChatRooms me={me}/>
+                    )
                 )}
+
                 {tab === "friends" && (
                     <>
                         <FriendList/>
