@@ -16,10 +16,10 @@ type Props = { me?: string | null };
 
 type ChatRoom = {
   id: number;            // 상대 id (없으면 0 폴백)
-  name: string;          // 표시용 이름
-  lastMessage?: string;  // 옵션
-  lastAt?: string;       // 옵션
-  unread?: number;       // 옵션
+  name: string;
+  lastMessage?: string;
+  lastAt?: string;
+  unread?: number;
 };
 
 export default function ChatRooms({ me }: Props) {
@@ -49,7 +49,7 @@ export default function ChatRooms({ me }: Props) {
 
         const res = await api.get("/api/v1/chat/chat-record", {
           headers: authHeader,
-          params: me ? { name: me } : undefined, // 구형 스펙 호환
+          params: me ? { name: me } : undefined,
         });
 
         const data = res.data;
@@ -80,7 +80,7 @@ export default function ChatRooms({ me }: Props) {
 
         if (mounted) setRooms(next);
       } catch (e) {
-        console.error("❌ chat-record 실패", e);
+        console.error("chat-record 실패", e);
         if (mounted) setErr("채팅방을 불러오지 못했습니다.");
       } finally {
         if (mounted) setLoading(false);
@@ -89,26 +89,8 @@ export default function ChatRooms({ me }: Props) {
     return () => { mounted = false; };
   }, [authHeader, me]);
 
-  // 이름 클릭 → User 객체로 열기
   const openRoom = async (room: ChatRoom) => {
     const user: User = { id: room.id, name: room.name, messages: [] };
-
-    // 깜빡임 방지: 선택 먼저 + 메시지 비우기
-    /*setSelectedUser(user);
-    setMessages([]);*/
-
-    // 필요하면 여기서 미리 대화 로드 (id 우선, name 폴백)
-    // try {
-    //   if (authHeader) {
-    //     const params = room.id ? { peerId: room.id } : { name: room.name, from: me ?? "" };
-    //     const res = await api.get("/api/v1/chat/chat-list", { headers: authHeader, params });
-    //     setMessages(res.data?.result ?? []);
-    //   }
-    // } catch (e) {
-    //   console.error("❌ chat-list 실패", e);
-    //   setMessages([]);
-    // }
-
     onChangeChat(user); // 소켓 구독/추가 fetch 등 기존 로직
   };
 

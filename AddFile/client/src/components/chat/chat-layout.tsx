@@ -46,13 +46,13 @@ export function ChatLayout({
         selectedUser?.messages ?? []
     );
     useEffect(() => {
-        if (!me) return;                          // 내 정보 준비 후
+        if (!me) return;
         const item = window.localStorage.getItem("selectedUser");
         if (!item) return;
 
         try {
             const savedUser: User = JSON.parse(item);
-            // ✅ 같은 onChangeChat 로직 재사용
+
             void handleChangeChat(savedUser);
         } catch (e) {
             console.error("saved selectedUser 파싱 실패:", e);
@@ -99,7 +99,7 @@ export function ChatLayout({
         setClient(C);
         C.activate();
     }, [me, client]);
-    // ❶ return 위에 “함수”로 선언 (토큰/헤더 포함)
+    // return 위에 “함수”로 선언 (토큰/헤더 포함)
     const handleChangeChat = async (user: User) => {
         const token = getCookie("auth");
         if (!me || !token) return;
@@ -151,7 +151,7 @@ export function ChatLayout({
                 setConnectedUsers,
                 setSelectedUser,
                 setMessages,
-                onChangeChat: handleChangeChat, // ✅ 분리한 함수 그대로 전달
+                onChangeChat: handleChangeChat, //
                 onEmojiSelect: (emoji: string) => {
                     if (!me || !selectedUser) return;
                     const newMessage: Message = {from: me, to: selectedUser.name, message: emoji};

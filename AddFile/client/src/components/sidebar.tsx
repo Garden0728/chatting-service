@@ -91,24 +91,6 @@ export function Sidebar({me, links, isCollapsed, messages}: SidebarProps) {
         }
     };
     const handleChangeChat = (user: User) => onChangeChat(user);
-    /* const handleChangeChat =  (user: User) => {
-         const result = await api.get("/api/v1/chat/chat-list", {
-             params: {
-                 name: user.name,
-                 from: me, // ✅ 더 이상 me.current 아님
-             },
-         });
-
-         setMessages(result.data.result);
-         window.localStorage.setItem("selectedUser", JSON.stringify(user));
-
-         setSelectedUser(user); // Context 세터
-         setSelectedUserState(user);
-         setConnectedUsers((prev) => {
-             if (prev.find((u) => u.id === user.id)) return prev;
-             return [...prev, user];
-         });
-     };*/
 
     useEffect(() => {
         const token = getCookie("auth");
@@ -120,7 +102,6 @@ export function Sidebar({me, links, isCollapsed, messages}: SidebarProps) {
 
     return (
         <div className="flex flex-col h-full">
-            {/* ✅ 탭 전환 */}
             <Box sx={{borderBottom: 1, borderColor: "divider"}}>
                 <Tabs
                     value={tab}
