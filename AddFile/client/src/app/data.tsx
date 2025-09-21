@@ -8,10 +8,16 @@ export const loggedInUserData = {
 
 export type LoggedInUserData = typeof loggedInUserData;
 
+export interface Word {
+  word_name: string;
+  detail: string;
+}
+
 export interface Message {
   to: string;
   from: string;
   message: string;
+  words?: Word[];
 }
 
 export type User = {

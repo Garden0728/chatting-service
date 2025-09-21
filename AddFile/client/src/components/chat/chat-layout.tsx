@@ -17,6 +17,7 @@ import {User, Message} from "@/app/data";
 import api from "@/lib/axios";
 import {redirect} from "next/navigation";
 import * as StompJs from "@stomp/stompjs";
+import {fetchWordDictionary} from "@/lib/sidebar_utils";
 
 interface ChatLayoutProps {
     defaultLayout: number[] | undefined;
@@ -159,6 +160,11 @@ export function ChatLayout({
                         destination: `/pub/chat/message/${me}`,
                         body: JSON.stringify(newMessage),
                     });
+                },
+                fetchWordDictionary: async (text: string) => {
+                    const token = getCookie("auth");
+                    if (!token) return [];
+                    return await fetchWordDictionary(text, token);
                 },
             }}
         >

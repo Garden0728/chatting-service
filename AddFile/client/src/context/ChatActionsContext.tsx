@@ -9,6 +9,7 @@ type ChatActionsContextType = {
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
     onChangeChat: (user: User) => void;
     onEmojiSelect?: (emoji: string) => void;
+    fetchWordDictionary?: (text: string) => Promise<{ word_name: string; detail: string }[]>;
 };
 
 const ChatActionsContext = createContext<ChatActionsContextType | null>(null);

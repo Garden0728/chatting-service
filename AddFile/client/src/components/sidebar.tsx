@@ -53,7 +53,7 @@ export const fetchUsers = async (searchQuery: string): Promise<User[]> => {
 };
 
 export function Sidebar({me, links, isCollapsed, messages}: SidebarProps) {
-    // ✅ Context에서 세터 함수들 받아오기
+    // Context에서 세터 함수들 받아오기
     const {setConnectedUsers, setSelectedUser, setMessages, onChangeChat} =
         useChatActions();
 
